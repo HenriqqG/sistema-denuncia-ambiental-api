@@ -12,6 +12,7 @@ public class Denuncia{
     @Id
     @Column(name = "id_denuncia")
     private Integer id;
+    private String numrProtocolo;
     private String rua;
     private String denunciante;
     private String bairro;
@@ -33,11 +34,9 @@ public class Denuncia{
         super();
     }
 
-    public Denuncia(Integer id, String rua, String denunciante, String bairro, String municipio, String cep,
-            String referencia, String latitude, String longitude, String texto, String status, String parecertecnico,
-            String dataIncidente, String dataCadastro, String provavelAutor, String categoria, String cpfDenunciante) {
-        super();
+    public Denuncia(Integer id, String numrProtocolo, String rua, String denunciante, String bairro, String municipio, String cep, String referencia, String latitude, String longitude, String texto, String status, String parecertecnico, String dataIncidente, String dataCadastro, String provavelAutor, String categoria, String cpfDenunciante) {
         this.id = id;
+        this.numrProtocolo = numrProtocolo;
         this.rua = rua;
         this.denunciante = denunciante;
         this.bairro = bairro;
@@ -190,6 +189,14 @@ public class Denuncia{
 
     public void setCpfDenunciante(String cpfDenunciante) {
         this.cpfDenunciante = cpfDenunciante;
+    }
+
+    public String getNumrProtocolo() {
+        return numrProtocolo;
+    }
+
+    public void setNumrProtocolo(String numrProtocolo) {
+        this.numrProtocolo = numrProtocolo;
     }
 
     

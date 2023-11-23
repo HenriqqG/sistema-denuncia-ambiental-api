@@ -1,5 +1,6 @@
 package com.sistemadenunciaamb.sda.controllers;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,14 @@ public class DenunciaController {
     public List<Denuncia>listarDenunciasPorCPF(@PathVariable String cpf){
         return denuncianteService.listarDenunciasPorCPF(cpf);
     }
+
+    @GetMapping("/buscar-por-numrprotocolo/{numrProtocolo}")
+    public Denuncia buscarDenunciaPorId(@PathVariable String numrProtocolo) throws ParseException{
+        return denuncianteService.buscarDenunciaPorNumProtocolo(numrProtocolo);
+    }
     
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrarDenuncia(@RequestBody Denuncia denuncia){
+    public ResponseEntity<?> cadastrarDenuncia(@RequestBody Denuncia denuncia) throws ParseException{
         denuncianteService.cadastrarDenuncia(denuncia);
         return ResponseEntity.ok().build();
     }

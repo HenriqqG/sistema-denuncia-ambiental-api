@@ -10,5 +10,6 @@ import com.sistemadenunciaamb.sda.models.Denuncia;
 @Repository
 public interface DenunciaRepository extends JpaRepository<Denuncia, Integer>{
     public List<Denuncia> findByCpfDenunciante(String cpf);
+    public Denuncia findByNumrProtocolo(String numrProtocolo);
     
 }
