@@ -43,13 +43,15 @@ public class DenunciaService {
     }
 
     public Denuncia cadastrarDenuncia(Denuncia denuncia) throws ParseException {
+        
         denuncia.setStatus(StatusDenunciaEnum.CRIADA.getDescricao());
         denuncia.setCpfDenunciante("05497491103");
         denuncia.setNumrProtocolo(denuncia.getId().toString()+"2023");
 
         Date dataAux = SDF_EN_US.parse(denuncia.getDataIncidente());
         denuncia.setDataIncidente(SDF_PT_BR.format(dataAux));
-        
+
+        validateDenuncia(denuncia);
         return denunciaRepository.save(denuncia);
     }
 
@@ -57,15 +59,20 @@ public class DenunciaService {
         denunciaRepository.deleteById(Integer.parseInt(id.toString()));
     }
 
-    public void editarDenuncia(Long id, Denuncia denuncia) {
+    public void editarDenuncia(Long id, Denuncia denuncia) throws ParseException {
         Denuncia denunciaToUpdate = denunciaRepository.findById(Integer.parseInt(id.toString())).get();
 
         denunciaToUpdate.setBairro(denuncia.getBairro());
         denunciaToUpdate.setCategoria(denuncia.getCategoria());
         denunciaToUpdate.setCep(denuncia.getCep());
         denunciaToUpdate.setCpfDenunciante(denuncia.getCpfDenunciante());
-        denunciaToUpdate.setDataCadastro(denuncia.getDataCadastro());
-        denunciaToUpdate.setDataIncidente(denuncia.getDataIncidente());
+
+        Date dataCadastroAux = SDF_EN_US.parse(denuncia.getDataCadastro());
+        denunciaToUpdate.setDataCadastro(SDF_PT_BR.format(dataCadastroAux));
+
+         Date dataIncidenteAux = SDF_EN_US.parse(denuncia.getDataIncidente());
+        denunciaToUpdate.setDataIncidente(SDF_PT_BR.format(dataIncidenteAux));
+
         denunciaToUpdate.setLatitude(denuncia.getLatitude());
         denunciaToUpdate.setLongitude(denuncia.getLongitude());
         denunciaToUpdate.setNumrProtocolo(denuncia.getNumrProtocolo());
@@ -76,6 +83,39 @@ public class DenunciaService {
         denunciaToUpdate.setMunicipio(denuncia.getMunicipio());
         denunciaToUpdate.setReferencia(denuncia.getReferencia());
 
+        validateDenuncia(denunciaToUpdate);
         denunciaRepository.save(denunciaToUpdate);
     }
+
+    private void validateDenuncia(Denuncia denuncia) throws ParseException {
+        String msg = "Todos os campos obrigatorios devem ser preenchidos";
+        
+        if(denuncia.getBairro() == null || denuncia.getBairro().isEmpty()){
+            throw new RuntimeException(msg);
+        }
+        if(denuncia.getCep() == null || denuncia.getCep().isEmpty()){
+            throw new RuntimeException(msg);
+        }
+        if(denuncia.getDataIncidente() == null || denuncia.getDataIncidente().isEmpty()){
+            throw new RuntimeException(msg);
+        }
+        if(denuncia.getMunicipio() == null || denuncia.getMunicipio().isEmpty()){
+            throw new RuntimeException(msg);
+        }
+        if(denuncia.getRua() == null || denuncia.getRua().isEmpty()){
+            throw new RuntimeException(msg);
+        }
+        if(denuncia.getTexto() == null || denuncia.getTexto().isEmpty()){
+            throw new RuntimeException(msg);
+        }
+        if(denuncia.getDenunciante() == null || denuncia.getDenunciante().isEmpty()){
+            throw new RuntimeException(msg);
+        }
+
+        Date dataAux = SDF_EN_US.parse(denuncia.getDataIncidente());
+        if(dataAux.after(new Date())){
+            throw new RuntimeException("Data do incidente não pode ser maior que a data atual");
+        }
+    }
+
 }

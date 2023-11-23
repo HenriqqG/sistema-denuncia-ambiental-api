@@ -48,7 +48,7 @@ public class DenunciaController {
     }
 
     @PutMapping("/editar/{id}")
-    public ResponseEntity<?> editarDenuncia(@PathVariable Long id, @RequestBody Denuncia denuncia){
+    public ResponseEntity<?> editarDenuncia(@PathVariable Long id, @RequestBody Denuncia denuncia) throws ParseException{
         denuncianteService.editarDenuncia(id, denuncia);
         return ResponseEntity.ok().build();
     }
