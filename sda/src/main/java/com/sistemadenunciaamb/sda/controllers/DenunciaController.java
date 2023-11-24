@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sistemadenunciaamb.sda.models.Denuncia;
+import com.sistemadenunciaamb.sda.models.dtos.DenunciaDTO;
 import com.sistemadenunciaamb.sda.services.DenunciaService;
 
 @RestController
@@ -27,28 +27,28 @@ public class DenunciaController {
     private DenunciaService denuncianteService;
 
     @GetMapping("/listar")
-    public List<Denuncia> listarDenuncias(){
+    public List<DenunciaDTO> listarDenuncias(){
         return denuncianteService.listarDenuncias();
     }
 
     @GetMapping("/listar-por-cpf/{cpf}")
-    public List<Denuncia>listarDenunciasPorCPF(@PathVariable String cpf){
+    public List<DenunciaDTO>listarDenunciasPorCPF(@PathVariable String cpf){
         return denuncianteService.listarDenunciasPorCPF(cpf);
     }
 
     @GetMapping("/buscar-por-numrprotocolo/{numrProtocolo}")
-    public Denuncia buscarDenunciaPorId(@PathVariable String numrProtocolo) throws ParseException{
+    public DenunciaDTO buscarDenunciaPorId(@PathVariable String numrProtocolo) throws ParseException{
         return denuncianteService.buscarDenunciaPorNumProtocolo(numrProtocolo);
     }
     
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrarDenuncia(@RequestBody Denuncia denuncia) throws ParseException{
+    public ResponseEntity<?> cadastrarDenuncia(@RequestBody DenunciaDTO denuncia) throws ParseException{
         denuncianteService.cadastrarDenuncia(denuncia);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/editar/{id}")
-    public ResponseEntity<?> editarDenuncia(@PathVariable Long id, @RequestBody Denuncia denuncia) throws ParseException{
+    public ResponseEntity<?> editarDenuncia(@PathVariable Long id, @RequestBody DenunciaDTO denuncia) throws ParseException{
         denuncianteService.editarDenuncia(id, denuncia);
         return ResponseEntity.ok().build();
     }
@@ -60,7 +60,7 @@ public class DenunciaController {
     }
 
     @PostMapping("/filtrar")
-    public List<Denuncia> filtrarDenuncias(@RequestBody Denuncia denuncia){
+    public List<DenunciaDTO> filtrarDenuncias(@RequestBody DenunciaDTO denuncia){
         return denuncianteService.filtrarDenuncias(denuncia);
     }
 }

@@ -2,6 +2,7 @@ package com.sistemadenunciaamb.sda.services;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,10 +13,10 @@ import org.springframework.util.ObjectUtils;
 
 import com.sistemadenunciaamb.sda.enums.StatusDenunciaEnum;
 import com.sistemadenunciaamb.sda.models.Denuncia;
+import com.sistemadenunciaamb.sda.models.dtos.DenunciaDTO;
 import com.sistemadenunciaamb.sda.repository.DenunciaRepository;
 
 @Service
-@Transactional
 public class DenunciaService {
 
     @Autowired
@@ -24,44 +25,107 @@ public class DenunciaService {
     private final SimpleDateFormat SDF_PT_BR = new SimpleDateFormat("dd/MM/yyyy");
     private final SimpleDateFormat SDF_EN_US = new SimpleDateFormat("yyyy-MM-dd");
     
-    public List<Denuncia> listarDenuncias(){
-        return denunciaRepository.findAll();
+    public List<DenunciaDTO> listarDenuncias(){
+        List<Denuncia> denuncias = denunciaRepository.findAll();
+        List<DenunciaDTO> retornoDenunciaDTOs = new ArrayList<>();
+
+        for(Denuncia denuncia : denuncias){
+            DenunciaDTO denunciaDTO = getDenunciaDTO(denuncia);
+            retornoDenunciaDTOs.add(denunciaDTO);
+        }
+
+        return retornoDenunciaDTOs;
     }
 
-    public List<Denuncia> listarDenunciasPorCPF(String cpf){
-        return denunciaRepository.findByCpfDenunciante(cpf);
+    public List<DenunciaDTO> listarDenunciasPorCPF(String cpf){
+        List<Denuncia> denuncias = denunciaRepository.findByCpfDenunciante(cpf);
+        List<DenunciaDTO> retornoDenunciaDTOs = new ArrayList<>();
+
+        for(Denuncia denuncia : denuncias){
+            DenunciaDTO denunciaDTO = getDenunciaDTO(denuncia);
+            retornoDenunciaDTOs.add(denunciaDTO);
+        }
+
+        return retornoDenunciaDTOs;
     }
 
-    public Denuncia buscarDenunciaPorNumProtocolo(String numrProtocolo) throws ParseException {
+    public DenunciaDTO buscarDenunciaPorNumProtocolo(String numrProtocolo) throws ParseException {
         Denuncia denuncia = denunciaRepository.findByNumrProtocolo(numrProtocolo);
 
         Date dataIncidenteAux = SDF_PT_BR.parse(denuncia.getDataIncidente());
         Date dataCadastroAux = SDF_PT_BR.parse(denuncia.getDataIncidente());
 
-        denuncia.setDataCadastro(SDF_EN_US.format(dataCadastroAux));
-        denuncia.setDataIncidente(SDF_EN_US.format(dataIncidenteAux));
-        return denuncia;
+        DenunciaDTO denunciaDTO = getDenunciaDTO(denuncia);
+
+        denunciaDTO.setDataCadastro(SDF_EN_US.format(dataCadastroAux));
+        denunciaDTO.setDataIncidente(SDF_EN_US.format(dataIncidenteAux));
+
+        return denunciaDTO;
     }
 
-    public Denuncia cadastrarDenuncia(Denuncia denuncia) throws ParseException {
-        
-        denuncia.setStatus(StatusDenunciaEnum.CRIADA.getDescricao());
-        denuncia.setCpfDenunciante("05497491103");
-        denuncia.setNumrProtocolo(denuncia.getId().toString()+"2023");
+    public List<DenunciaDTO> filtrarDenuncias(DenunciaDTO denuncia) {
+        String numrProtocolo = ObjectUtils.isEmpty(denuncia.getNumrProtocolo()) ? null : denuncia.getNumrProtocolo();
+        String municipio = ObjectUtils.isEmpty(denuncia.getMunicipio()) ? null : denuncia.getMunicipio();
+        String status = ObjectUtils.isEmpty(denuncia.getStatus()) ? null : denuncia.getStatus();
+        String dataIncidente = ObjectUtils.isEmpty(denuncia.getDataIncidente()) ? null : denuncia.getDataIncidente();
+        String dataCadastro = ObjectUtils.isEmpty(denuncia.getDataCadastro()) ? null : denuncia.getDataCadastro();
+        String categoria = ObjectUtils.isEmpty(denuncia.getCategoria()) ? null : denuncia.getCategoria();
+
+        if (numrProtocolo == null && municipio == null && status == null && dataIncidente == null && dataCadastro == null && categoria == null) {
+            return listarDenuncias();
+        } else {
+            List<Denuncia> denuncias = denunciaRepository.findAllByQuery(numrProtocolo, municipio, status, dataIncidente, dataCadastro, categoria);
+            List<DenunciaDTO> retornoDenunciaDTOs = new ArrayList<>();
+
+            for (Denuncia denunciaAux : denuncias) {
+                DenunciaDTO denunciaDTO = getDenunciaDTO(denunciaAux);
+                retornoDenunciaDTOs.add(denunciaDTO);
+            }
+
+            return retornoDenunciaDTOs;
+        }
+    }
+    
+    @Transactional
+    public void cadastrarDenuncia(DenunciaDTO denuncia) throws ParseException {
+        validateDenuncia(denuncia);
+
+        Denuncia denunciaToSave = new Denuncia();
+
+        denunciaToSave.setId(denuncia.getId());
+        denunciaToSave.setCep(denuncia.getCep());
+        denunciaToSave.setBairro(denuncia.getBairro());
+        denunciaToSave.setMunicipio(denuncia.getMunicipio());
+        denunciaToSave.setReferencia(denuncia.getReferencia());
+        denunciaToSave.setLatitude(denuncia.getLatitude());
+        denunciaToSave.setLongitude(denuncia.getLongitude());
+        denunciaToSave.setRua(denuncia.getRua());
+
+        denunciaToSave.setDenunciante(denuncia.getDenunciante());
+        denunciaToSave.setCategoria(denuncia.getCategoria());
+        denunciaToSave.setTexto(denuncia.getTexto());
+        denunciaToSave.setProvavelAutor(denuncia.getProvavelAutor());
+
+        denunciaToSave.setStatus(StatusDenunciaEnum.CRIADA.getDescricao());
+        denunciaToSave.setCpfDenunciante("05497491103");
+        denunciaToSave.setNumrProtocolo(denuncia.getId().toString()+"2023");
 
         Date dataAux = SDF_EN_US.parse(denuncia.getDataIncidente());
-        denuncia.setDataIncidente(SDF_PT_BR.format(dataAux));
-        denuncia.setDataCadastro(SDF_PT_BR.format(new Date()));
-
-        validateDenuncia(denuncia);
-        return denunciaRepository.save(denuncia);
+        denunciaToSave.setDataIncidente(SDF_PT_BR.format(dataAux));
+        denunciaToSave.setDataCadastro(SDF_PT_BR.format(new Date()));
+        
+        denunciaRepository.save(denunciaToSave);
     }
 
+    @Transactional
     public void deletarDenuncia(Long id) {
         denunciaRepository.deleteById(Integer.parseInt(id.toString()));
     }
 
-    public void editarDenuncia(Long id, Denuncia denuncia) throws ParseException {
+    @Transactional
+    public void editarDenuncia(Long id, DenunciaDTO denuncia) throws ParseException {
+        validateDenuncia(denuncia);
+
         Denuncia denunciaToUpdate = denunciaRepository.findById(Integer.parseInt(id.toString())).get();
 
         denunciaToUpdate.setBairro(denuncia.getBairro());
@@ -85,11 +149,10 @@ public class DenunciaService {
         denunciaToUpdate.setMunicipio(denuncia.getMunicipio());
         denunciaToUpdate.setReferencia(denuncia.getReferencia());
 
-        validateDenuncia(denunciaToUpdate);
         denunciaRepository.save(denunciaToUpdate);
     }
 
-    private void validateDenuncia(Denuncia denuncia) throws ParseException {
+    private void validateDenuncia(DenunciaDTO denuncia) throws ParseException {
         String msg = "Todos os campos obrigatorios devem ser preenchidos";
 
         if(denuncia.getBairro() == null || denuncia.getBairro().isEmpty()){
@@ -114,25 +177,33 @@ public class DenunciaService {
             throw new RuntimeException(msg);
         }
 
-        Date dataAux = SDF_PT_BR.parse(denuncia.getDataIncidente());
+        Date dataAux = SDF_EN_US.parse(denuncia.getDataIncidente());
         if(dataAux.after(new Date())){
             throw new RuntimeException("Data do incidente não pode ser maior que a data atual");
         }
     }
 
-    public List<Denuncia> filtrarDenuncias(Denuncia denuncia) {
-        String numrProtocolo = ObjectUtils.isEmpty(denuncia.getNumrProtocolo()) ? null : denuncia.getNumrProtocolo();
-        String municipio = ObjectUtils.isEmpty(denuncia.getMunicipio()) ? null : denuncia.getMunicipio();
-        String status = ObjectUtils.isEmpty(denuncia.getStatus()) ? null : denuncia.getStatus();
-        String dataIncidente = ObjectUtils.isEmpty(denuncia.getDataIncidente()) ? null : denuncia.getDataIncidente();
-        String dataCadastro = ObjectUtils.isEmpty(denuncia.getDataCadastro()) ? null : denuncia.getDataCadastro();
-        String categoria = ObjectUtils.isEmpty(denuncia.getCategoria()) ? null : denuncia.getCategoria();
+    private DenunciaDTO getDenunciaDTO(Denuncia denuncia) {
+        DenunciaDTO denunciaDTO = new DenunciaDTO();
 
-        if (numrProtocolo == null && municipio == null && status == null && dataIncidente == null && dataCadastro == null && categoria == null) {
-            return denunciaRepository.findAll();
-        } else {
-            return denunciaRepository.findAllByQuery(numrProtocolo, municipio, status, dataIncidente, dataCadastro, categoria);
-        }
+        denunciaDTO.setId(denuncia.getId());
+        denunciaDTO.setBairro(denuncia.getBairro());
+        denunciaDTO.setCategoria(denuncia.getCategoria());
+        denunciaDTO.setCep(denuncia.getCep());
+        denunciaDTO.setCpfDenunciante(denuncia.getCpfDenunciante());
+        denunciaDTO.setDataCadastro(denuncia.getDataCadastro());
+        denunciaDTO.setDataIncidente(denuncia.getDataIncidente());
+        denunciaDTO.setDenunciante(denuncia.getDenunciante());
+        denunciaDTO.setLatitude(denuncia.getLatitude());
+        denunciaDTO.setLongitude(denuncia.getLongitude());
+        denunciaDTO.setMunicipio(denuncia.getMunicipio());
+        denunciaDTO.setNumrProtocolo(denuncia.getNumrProtocolo());
+        denunciaDTO.setProvavelAutor(denuncia.getProvavelAutor());
+        denunciaDTO.setReferencia(denuncia.getReferencia());
+        denunciaDTO.setRua(denuncia.getRua());
+        denunciaDTO.setStatus(denuncia.getStatus());
+        denunciaDTO.setTexto(denuncia.getTexto());
+        return denunciaDTO;
     }
 
 }

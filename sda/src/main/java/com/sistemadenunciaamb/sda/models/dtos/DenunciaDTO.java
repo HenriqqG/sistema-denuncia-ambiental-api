@@ -1,20 +1,8 @@
-package com.sistemadenunciaamb.sda.models;
+package com.sistemadenunciaamb.sda.models.dtos;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "denuncias")
-public class Denuncia{
-
-    @Id
-    @Column(name = "id_denuncia")
+public class DenunciaDTO {
     private Integer id;
     private String numrProtocolo;
     private String rua;
@@ -33,16 +21,18 @@ public class Denuncia{
     private String provavelAutor;
     private String categoria;
     private String cpfDenunciante;
-
-    @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
-    private List<Andamento> andamentos;
+    private List<AndamentoDTO> andamentos;
     
-
-    public Denuncia() {
+    public DenunciaDTO() {
         super();
     }
 
-    public Denuncia(Integer id, String numrProtocolo, String rua, String denunciante, String bairro, String municipio, String cep, String referencia, String latitude, String longitude, String texto, String status, String parecertecnico, String dataIncidente, String dataCadastro, String provavelAutor, String categoria, String cpfDenunciante, List<Andamento> andamentos) {
+    
+
+    public DenunciaDTO(Integer id, String numrProtocolo, String rua, String denunciante, String bairro,
+            String municipio, String cep, String referencia, String latitude, String longitude, String texto,
+            String status, String parecertecnico, String dataIncidente, String dataCadastro, String provavelAutor,
+            String categoria, String cpfDenunciante, List<AndamentoDTO> andamentos) {
         this.id = id;
         this.numrProtocolo = numrProtocolo;
         this.rua = rua;
@@ -70,6 +60,14 @@ public class Denuncia{
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getNumrProtocolo() {
+        return numrProtocolo;
+    }
+
+    public void setNumrProtocolo(String numrProtocolo) {
+        this.numrProtocolo = numrProtocolo;
     }
 
     public String getRua() {
@@ -200,19 +198,11 @@ public class Denuncia{
         this.cpfDenunciante = cpfDenunciante;
     }
 
-    public String getNumrProtocolo() {
-        return numrProtocolo;
-    }
-
-    public void setNumrProtocolo(String numrProtocolo) {
-        this.numrProtocolo = numrProtocolo;
-    }
-
-    public List<Andamento> getAndamentos() {
+    public List<AndamentoDTO> getAndamentos() {
         return andamentos;
     }
 
-    public void setAndamentos(List<Andamento> andamentos) {
+    public void setAndamentos(List<AndamentoDTO> andamentos) {
         this.andamentos = andamentos;
     }
     
