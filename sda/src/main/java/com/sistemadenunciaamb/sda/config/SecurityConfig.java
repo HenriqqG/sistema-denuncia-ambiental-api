@@ -1,12 +1,13 @@
 package com.sistemadenunciaamb.sda.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +19,9 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -51,20 +55,20 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        // httpSecurity.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> {
-        //     auth.requestMatchers("/auth/**").permitAll();
-        //     auth.requestMatchers("/denunciante/**").hasRole("DENUNCIANTE");
-        //     auth.requestMatchers("/analista/**").hasRole("ANALISTA");
-        //     auth.anyRequest().authenticated();
-        // });
+        httpSecurity.cors().and().csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> {
+            auth.requestMatchers("/auth/**").permitAll();
+            auth.requestMatchers("/denunciante/**").hasRole("DENUNCIANTE");
+            auth.requestMatchers("/analista/**").hasRole("ANALISTA");
+            auth.anyRequest().authenticated();
+        });
 
-        // httpSecurity.oauth2ResourceServer()
-        // .jwt()
-        // .jwtAuthenticationConverter(jwtAuthenticationConverter());
+        httpSecurity.oauth2ResourceServer()
+        .jwt()
+        .jwtAuthenticationConverter(jwtAuthenticationConverter());
 
-        // httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        return httpSecurity.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.anyRequest().permitAll()).build();
+        return httpSecurity.build();
     }
 
     @Bean
@@ -89,4 +93,17 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
+
+    @Bean
+	CorsConfigurationSource corsConfigurationSource() {
+
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("*"));
+		configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 }

@@ -107,7 +107,7 @@ public class DenunciaService {
         denunciaToSave.setProvavelAutor(denuncia.getProvavelAutor());
 
         denunciaToSave.setStatus(StatusDenunciaEnum.CRIADA.getDescricao());
-        denunciaToSave.setCpfDenunciante("05497491103");
+        denunciaToSave.setCpfDenunciante(denuncia.getCpfDenunciante());
         denunciaToSave.setNumrProtocolo(denuncia.getId().toString()+"2023");
 
         Date dataAux = SDF_EN_US.parse(denuncia.getDataIncidente());

@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sistemadenunciaamb.sda.models.dtos.DenunciaDTO;
 import com.sistemadenunciaamb.sda.services.DenunciaService;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/denuncia")
-@CrossOrigin(origins = "*")
 public class DenunciaController {
 
     @Autowired
