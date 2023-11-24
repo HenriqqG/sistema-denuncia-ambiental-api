@@ -22,7 +22,7 @@ public class AuthController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegistrationDTO registerDTO){
+    public ResponseEntity<?> registerUser(@RequestBody RegistrationDTO registerDTO) throws Exception{
         authenticationService.registerUser(registerDTO.getCpf(), registerDTO.getPassword(), registerDTO.getRole());
         return ResponseEntity.ok().build();
     }

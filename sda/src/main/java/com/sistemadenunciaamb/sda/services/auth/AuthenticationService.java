@@ -37,7 +37,11 @@ public class AuthenticationService {
     @Autowired
     private TokenService tokenService;
 
-    public ApplicationUser registerUser(String username, String password, String role){
+    public ApplicationUser registerUser(String username, String password, String role) throws Exception{
+        if(!userRepository.findByUsername(username).isEmpty()){
+            throw new Exception("Usuário já existe");
+        }
+
         String encodedPass = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority(role).get();
 
