@@ -58,4 +58,9 @@ public class DenunciaController {
         denuncianteService.deletarDenuncia(id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/filtrar")
+    public List<Denuncia> filtrarDenuncias(@RequestBody Denuncia denuncia){
+        return denuncianteService.filtrarDenuncias(denuncia);
+    }
 }

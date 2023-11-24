@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import com.sistemadenunciaamb.sda.enums.StatusDenunciaEnum;
 import com.sistemadenunciaamb.sda.models.Denuncia;
@@ -50,6 +51,7 @@ public class DenunciaService {
 
         Date dataAux = SDF_EN_US.parse(denuncia.getDataIncidente());
         denuncia.setDataIncidente(SDF_PT_BR.format(dataAux));
+        denuncia.setDataCadastro(SDF_PT_BR.format(new Date()));
 
         validateDenuncia(denuncia);
         return denunciaRepository.save(denuncia);
@@ -89,7 +91,7 @@ public class DenunciaService {
 
     private void validateDenuncia(Denuncia denuncia) throws ParseException {
         String msg = "Todos os campos obrigatorios devem ser preenchidos";
-        
+
         if(denuncia.getBairro() == null || denuncia.getBairro().isEmpty()){
             throw new RuntimeException(msg);
         }
@@ -112,9 +114,24 @@ public class DenunciaService {
             throw new RuntimeException(msg);
         }
 
-        Date dataAux = SDF_EN_US.parse(denuncia.getDataIncidente());
+        Date dataAux = SDF_PT_BR.parse(denuncia.getDataIncidente());
         if(dataAux.after(new Date())){
             throw new RuntimeException("Data do incidente não pode ser maior que a data atual");
+        }
+    }
+
+    public List<Denuncia> filtrarDenuncias(Denuncia denuncia) {
+        String numrProtocolo = ObjectUtils.isEmpty(denuncia.getNumrProtocolo()) ? null : denuncia.getNumrProtocolo();
+        String municipio = ObjectUtils.isEmpty(denuncia.getMunicipio()) ? null : denuncia.getMunicipio();
+        String status = ObjectUtils.isEmpty(denuncia.getStatus()) ? null : denuncia.getStatus();
+        String dataIncidente = ObjectUtils.isEmpty(denuncia.getDataIncidente()) ? null : denuncia.getDataIncidente();
+        String dataCadastro = ObjectUtils.isEmpty(denuncia.getDataCadastro()) ? null : denuncia.getDataCadastro();
+        String categoria = ObjectUtils.isEmpty(denuncia.getCategoria()) ? null : denuncia.getCategoria();
+
+        if (numrProtocolo == null && municipio == null && status == null && dataIncidente == null && dataCadastro == null && categoria == null) {
+            return denunciaRepository.findAll();
+        } else {
+            return denunciaRepository.findAllByQuery(numrProtocolo, municipio, status, dataIncidente, dataCadastro, categoria);
         }
     }
 
