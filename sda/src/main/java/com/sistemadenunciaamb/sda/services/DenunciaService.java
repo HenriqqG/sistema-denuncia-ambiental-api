@@ -169,7 +169,7 @@ public class DenunciaService {
         andamentoJPA.setParecerTecnico(andamento.getParecerTecnico());
         andamentoJPA.setCpfAnalista(andamento.getCpfAnalista());
         andamentoJPA.setDescricao(andamento.getDescricao());
-        andamentoJPA.setDenuncia(denuncia);
+        andamentoJPA.setDenuncia(denuncia); 
 
         andamentoRepository.save(andamentoJPA);
 
