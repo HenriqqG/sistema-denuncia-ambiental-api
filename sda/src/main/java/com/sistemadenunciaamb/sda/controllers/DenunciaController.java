@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sistemadenunciaamb.sda.models.dtos.AndamentoDTO;
 import com.sistemadenunciaamb.sda.models.dtos.DenunciaDTO;
 import com.sistemadenunciaamb.sda.services.DenunciaService;
 
@@ -40,6 +41,17 @@ public class DenunciaController {
     public DenunciaDTO buscarDenunciaPorId(@PathVariable String numrProtocolo) throws ParseException{
         return denuncianteService.buscarDenunciaPorNumProtocolo(numrProtocolo);
     }
+
+    @PostMapping("/filtrar")
+    public List<DenunciaDTO> filtrarDenuncias(@RequestBody DenunciaDTO denuncia){
+        return denuncianteService.filtrarDenuncias(denuncia);
+    }
+
+    @PostMapping("/cadastrar-andamento")
+    public ResponseEntity<?> cadastrarAndamento(@RequestBody AndamentoDTO andamento){
+        denuncianteService.cadastrarAndamento(andamento);
+        return ResponseEntity.ok().build();
+    }
     
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarDenuncia(@RequestBody DenunciaDTO denuncia) throws ParseException{
@@ -57,10 +69,5 @@ public class DenunciaController {
     public ResponseEntity<?> deletarDenuncia(@PathVariable Long id){
         denuncianteService.deletarDenuncia(id);
         return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/filtrar")
-    public List<DenunciaDTO> filtrarDenuncias(@RequestBody DenunciaDTO denuncia){
-        return denuncianteService.filtrarDenuncias(denuncia);
     }
 }

@@ -12,8 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import com.sistemadenunciaamb.sda.enums.StatusDenunciaEnum;
+import com.sistemadenunciaamb.sda.models.Andamento;
 import com.sistemadenunciaamb.sda.models.Denuncia;
+import com.sistemadenunciaamb.sda.models.dtos.AndamentoDTO;
 import com.sistemadenunciaamb.sda.models.dtos.DenunciaDTO;
+import com.sistemadenunciaamb.sda.repository.AndamentoRepository;
 import com.sistemadenunciaamb.sda.repository.DenunciaRepository;
 
 @Service
@@ -21,6 +24,8 @@ public class DenunciaService {
 
     @Autowired
     private DenunciaRepository denunciaRepository;
+    @Autowired
+    private AndamentoRepository andamentoRepository;
 
     private final SimpleDateFormat SDF_PT_BR = new SimpleDateFormat("dd/MM/yyyy");
     private final SimpleDateFormat SDF_EN_US = new SimpleDateFormat("yyyy-MM-dd");
@@ -150,6 +155,29 @@ public class DenunciaService {
         denunciaToUpdate.setReferencia(denuncia.getReferencia());
 
         denunciaRepository.save(denunciaToUpdate);
+    }
+
+    @Transactional
+    public void cadastrarAndamento(AndamentoDTO andamento) {
+        Denuncia denuncia = denunciaRepository.findById(Integer.parseInt(andamento.getIdDenuncia().toString())).get();
+        
+        List<Andamento> andamentoList = new ArrayList<>();
+        Andamento andamentoJPA = new Andamento();
+
+        andamentoJPA.setDataCadastroAndamento(SDF_PT_BR.format(new Date()));
+        andamentoJPA.setDescricao(andamento.getDescricao());
+        andamentoJPA.setParecerTecnico(andamento.getParecerTecnico());
+        andamentoJPA.setCpfAnalista(andamento.getCpfAnalista());
+        andamentoJPA.setDescricao(andamento.getDescricao());
+        andamentoJPA.setDenuncia(denuncia);
+
+        andamentoRepository.save(andamentoJPA);
+
+        andamentoList.add(andamentoJPA);
+        denuncia.setAndamentos(andamentoList);
+
+        denuncia.setStatus(andamento.getStatus());
+        denunciaRepository.save(denuncia);
     }
 
     private void validateDenuncia(DenunciaDTO denuncia) throws ParseException {
