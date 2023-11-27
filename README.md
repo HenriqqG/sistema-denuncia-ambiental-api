@@ -23,7 +23,7 @@
 
 > Reposítorio que contém a parte de APIs de um Sistema para realização de denúncias ambientais, criado em 2 dias juntamente à parte de Frontend (https://github.com/HenriqqG/sistema-denuncia-ambiental) como parte de um desafio
 
-**[Sistema de Denúncia Ambiental]** é um projeto realizado para estudos e aprendizados relacinados à: 
+**[Sistema de Denúncia Ambiental]** é um projeto realizado para estudos e aprendizados relacionados à: 
 - Criação de um Projeto do Zero;
 - Utilização e Implementação de autenticadores como JWT e OAuth2
 - Funcionamento de um projeto baseado em APIs
@@ -57,12 +57,13 @@
 ## 🚀 Live Demo <a name="live-demo"></a>
 
 - [Link para Utilização da API e seus serviços](https://sistema-denuncia-ambiental-e61aaa6cb4cb.herokuapp.com/)
+``` https://sistema-denuncia-ambiental-e61aaa6cb4cb.herokuapp.com/ ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## 💻 Iniciando <a name="getting-started"></a>
 
-Não tem muito segredo para rodar o projeto localmento, basta apenas cloná-lo e rodar! Para utilizar os serviços disponibilizados no link de Live Demo
+Não tem muito segredo para rodar o projeto localmente, basta apenas cloná-lo e rodar!
 
 ## Utilizando a API <a name="utilizando-api"></a>
 ### Cadastro e Login
